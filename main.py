@@ -16,7 +16,7 @@ load_dotenv()
 app = FastAPI()
 
 # =============================
-# Configuration
+# Configuration..
 # =============================
 
 # Set your Gemini API key
