@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+pydantic
+requests
+python-multipart
+PyMuPDF==1.22.0
+sentence-transformers
+pinecone
+google-generativeai
+dotenv
+PyPDF2
