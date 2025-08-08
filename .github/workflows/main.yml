@@ -1,0 +1,41 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Set up Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: bajaj-468317
+
+    - name: Configure Docker authentication
+      run: gcloud auth configure-docker us-central1-docker.pkg.dev
+
+    - name: Build and Push Docker Image
+      run: |
+        docker build -t us-central1-docker.pkg.dev/bajaj-468317/rag-repo/rag:latest .
+        docker push us-central1-docker.pkg.dev/bajaj-468317/rag-repo/rag:latest
+
+    - name: Deploy to Cloud Run
+      run: |
+        gcloud run deploy rag \
+          --image us-central1-docker.pkg.dev/bajaj-468317/rag-repo/rag:latest \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars "PINECONE_API_KEY=${{ secrets.PINECONE_API_KEY }},GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}"
